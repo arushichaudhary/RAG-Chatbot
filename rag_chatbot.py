@@ -38,21 +38,20 @@ class RAGChatbot:
         return PROMPT_TEMPLATE.format(context=context, question=query)
 
     def generate_answer(self, prompt):
-        api_key = os.environ.get("OPENAI_API_KEY")
+        api_key = os.environ.get("GEMINI_API_KEY")
 
         if not api_key:
-            return ("OPENAI_API_KEY not set. Showing retrieved context instead of "
+            return ("GEMINI_API_KEY not set. Showing retrieved context instead of "
                     "a generated answer:\n\n" + prompt)
 
-        from openai import OpenAI
-        client = OpenAI(api_key=api_key)
+        from google import genai
+        client = genai.Client(api_key=api_key)
 
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt
         )
-        return response.choices[0].message.content
+        return response.text
 
     def ask(self, query):
         chunks = self.retrieve(query)

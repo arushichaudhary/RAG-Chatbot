@@ -36,10 +36,10 @@ source venv/bin/activate   (Linux/Mac)
 pip install -r requirements.txt
 ```
 
-3. (Optional) Set your OpenAI API key to get actual generated answers instead of just the raw retrieved context
+3. (Optional) Set your Gemini API key to get actual generated answers instead of just the raw retrieved context. Get a free key at https://aistudio.google.com/apikey (no billing required).
 ```
-set OPENAI_API_KEY=your_key_here       (Windows)
-export OPENAI_API_KEY=your_key_here    (Linux/Mac)
+set GEMINI_API_KEY=your_key_here       (Windows)
+export GEMINI_API_KEY=your_key_here    (Linux/Mac)
 ```
 
 ## Usage
@@ -66,7 +66,7 @@ Bot: The hostel fee is Rs. 20,000 per semester.
 ```
 
 ## Notes
-- If `OPENAI_API_KEY` is not set, the chatbot will show the retrieved context instead of a generated answer.
+- If `GEMINI_API_KEY` is not set, the chatbot will show the retrieved context instead of a generated answer.
 - Add more documents to `data/` and update `ingest.py` to build a larger knowledge base.
 - The web interface uses a pastel color theme (soft lavender background, pink user bubbles, mint bot bubbles).
 
@@ -78,6 +78,6 @@ Bot: The hostel fee is Rs. 20,000 per semester.
    - **Build Command:** `pip install -r requirements.txt && python ingest.py`
    - **Start Command:** (already set in the `Procfile`, Render picks it up automatically)
 4. Under **Environment**, add an environment variable:
-   - `OPENAI_API_KEY` = your OpenAI key
+   - `GEMINI_API_KEY` = your Gemini key
 5. Deploy. Render will build the vector database during the build step and start the Streamlit app using the `Procfile`.
 6. Once deployed, Render gives you a public URL like `https://your-app-name.onrender.com`.
