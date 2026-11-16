@@ -10,19 +10,18 @@ A Retrieval-Augmented Generation (RAG) chatbot that answers questions about ABC 
 4. When a user asks a question, it is converted into an embedding and compared against stored chunks to retrieve the three most relevant results.
 5. The retrieved information is inserted into a prompt and sent to Gemini to generate a context-based answer.
 
-## Project Structure
-
-```text
 RAG_Chatbot/
 ├── data/
 │   └── university.txt
-├── vector_db/          (created after running ingest.py)
+├── evaluation/
+│   ├── test_questions.json
+│   └── evaluate.py
+├── vector_db/
 ├── ingest.py
 ├── rag_chatbot.py
 ├── app.py
 ├── requirements.txt
 └── README.md
-```
 
 ## Setup
 
