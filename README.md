@@ -2,15 +2,17 @@
 
 A Retrieval-Augmented Generation (RAG) chatbot that answers questions about ABC University using its own knowledge base instead of relying only on the LLM's memory.
 
-## How it works
-1. The university document (`data/university.txt`) is loaded and split into chunks.
-2. Each chunk is converted into an embedding using a sentence-transformers model.
+## How It Works
+
+1. The university document (`data/university.txt`) is loaded and split into smaller chunks.
+2. Each chunk is converted into a numerical embedding using a Sentence Transformers model.
 3. The embeddings are stored in a FAISS vector database.
-4. When a user asks a question, it is embedded and compared against the stored chunks to find the most relevant ones.
-5. The retrieved chunks are inserted into a prompt and sent to an LLM to generate the final answer.
+4. When a user asks a question, it is converted into an embedding and compared against stored chunks to retrieve the three most relevant results.
+5. The retrieved information is inserted into a prompt and sent to Gemini to generate a context-based answer.
 
 ## Project Structure
-```
+
+```text
 RAG_Chatbot/
 ├── data/
 │   └── university.txt
@@ -24,60 +26,177 @@ RAG_Chatbot/
 
 ## Setup
 
-1. Create and activate a virtual environment
-```
+### 1. Create and Activate a Virtual Environment
+
+```bash
 python -m venv venv
-venv\Scripts\activate      (Windows)
-source venv/bin/activate   (Linux/Mac)
 ```
 
-2. Install dependencies
+Windows:
+```bash
+venv\Scripts\activate
 ```
+
+Linux/Mac:
+```bash
+source venv/bin/activate
+```
+
+### 2. Install Dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
-3. (Optional) Set your Gemini API key to get actual generated answers instead of just the raw retrieved context. Get a free key at https://aistudio.google.com/apikey (no billing required).
+### 3. Configure Gemini API Key (Optional)
+
+Set your Gemini API key to generate answers using the LLM.
+
+Get an API key from:
+https://aistudio.google.com/apikey
+
+Windows:
+```bash
+set GEMINI_API_KEY=your_key_here
 ```
-set GEMINI_API_KEY=your_key_here       (Windows)
-export GEMINI_API_KEY=your_key_here    (Linux/Mac)
+
+Linux/Mac:
+```bash
+export GEMINI_API_KEY=your_key_here
 ```
 
 ## Usage
 
-1. Build the vector database (run this once, or whenever you update `data/university.txt`)
-```
+### 1. Build the Vector Database
+
+Run this once, or whenever you update `data/university.txt`.
+
+```bash
 python ingest.py
 ```
 
-2. Chat from the terminal
-```
+### 2. Chat from the Terminal
+
+```bash
 python rag_chatbot.py
 ```
 
-3. Or launch the web interface
-```
+### 3. Launch the Web Interface
+
+```bash
 streamlit run app.py
 ```
 
-## Example
-```
+## Sample Inputs and Expected Outputs
+
+The following examples are based on the information available in `data/university.txt`. Outputs are illustrative and have not yet been verified through a live execution.
+
+### Example 1: Hostel Information
+
+**Input:**
+```text
 You: What is the hostel fee?
+```
+
+**Expected Output:**
+```text
 Bot: The hostel fee is Rs. 20,000 per semester.
 ```
 
+### Example 2: Admission Information
+
+**Input:**
+```text
+You: When does admission open?
+```
+
+**Expected Output:**
+```text
+Bot: Admission at ABC University opens on July 15.
+```
+
+### Example 3: Academic Information
+
+**Input:**
+```text
+You: What courses does the Computer Science department offer?
+```
+
+**Expected Output:**
+```text
+Bot: The Computer Science department offers
+Machine Learning, Data Structures, Operating Systems,
+and Web Development.
+```
+
+### Example 4: Question Outside the Knowledge Base
+
+**Input:**
+```text
+You: Who won the FIFA World Cup in 2022?
+```
+
+**Expected Output (with Gemini API configured):**
+```text
+Bot: I don't know.
+```
+
+The prompt instructs the LLM to answer only using the supplied context and respond with "I don't know" when the information is unavailable.
+
+**Note:** These are expected responses based on the knowledge-base content and prompt instructions, not outputs from a completed test. The current implementation does not include a separate similarity threshold to guarantee rejection of unrelated questions.
+
+## My Contributions
+
+I independently designed and developed this RAG chatbot, implementing its document processing, retrieval pipeline, LLM integration, and user interface.
+
+My contributions include:
+
+- Created the university knowledge-base document containing information about admissions, fees, hostels, academics, examinations, and placements.
+- Implemented document loading and text chunking using LangChain's `TextLoader` and `RecursiveCharacterTextSplitter`.
+- Integrated Sentence Transformers to generate semantic embeddings using the `all-MiniLM-L6-v2` model.
+- Implemented FAISS vector storage and similarity-based retrieval to find relevant information for user queries.
+- Developed the RAG pipeline to combine retrieved document chunks with user questions and construct context-based prompts.
+- Integrated Google's Gemini 2.5 Flash API for natural-language answer generation.
+- Developed a Streamlit-based chatbot interface with chat history, custom chat bubbles, and an option to view retrieved document chunks.
+- Implemented an API-key fallback so that the application can display retrieved context when a Gemini API key is not configured.
+
+## Technical Decisions
+
+- **Sentence Transformers (`all-MiniLM-L6-v2`):** Selected to generate semantic embeddings that help identify relevant information based on the meaning of a query.
+- **FAISS:** Used for efficient similarity-based retrieval of relevant document chunks.
+- **Chunking Strategy:** Used a chunk size of 500 characters with an overlap of 50 characters to retain some context between consecutive chunks.
+- **Top-K Retrieval:** Configured the retriever to return the three most relevant chunks for each query.
+- **RAG Architecture:** Used retrieval-augmented generation to provide the LLM with relevant university information before generating an answer.
+- **Gemini 2.5 Flash:** Integrated for generating natural-language responses using the retrieved context.
+- **Streamlit:** Chosen to build an interactive web interface without requiring a separate frontend application.
+
 ## Notes
-- If `GEMINI_API_KEY` is not set, the chatbot will show the retrieved context instead of a generated answer.
-- Add more documents to `data/` and update `ingest.py` to build a larger knowledge base.
-- The web interface uses a pastel color theme (soft lavender background, pink user bubbles, mint bot bubbles).
+
+- If `GEMINI_API_KEY` is not set, the chatbot displays the retrieved context and prompt instead of a generated answer.
+- Additional information can be added to `data/university.txt`, followed by rebuilding the vector database using `ingest.py`.
+- The web interface uses a pastel color theme with a soft lavender background, pink user bubbles, and mint bot bubbles.
+- The application also displays retrieved document chunks to make the retrieval process easier to inspect.
 
 ## Deploying on Render
 
-1. Push this project to a GitHub repository (`vector_db/` and `venv/` are excluded via `.gitignore` since they're rebuilt on deploy).
-2. On Render, create a new **Web Service** and connect your GitHub repo.
-3. Set the following:
-   - **Build Command:** `pip install -r requirements.txt && python ingest.py`
-   - **Start Command:** (already set in the `Procfile`, Render picks it up automatically)
-4. Under **Environment**, add an environment variable:
-   - `GEMINI_API_KEY` = your Gemini key
-5. Deploy. Render will build the vector database during the build step and start the Streamlit app using the `Procfile`.
-6. Once deployed, Render gives you a public URL like `https://your-app-name.onrender.com`.
+1. Push the project to a GitHub repository. The `vector_db/` and `venv/` directories are excluded using `.gitignore`.
+2. On Render, create a new Web Service and connect your GitHub repository.
+3. Configure the following:
+
+**Build Command:**
+```bash
+pip install -r requirements.txt && python ingest.py
+```
+
+**Start Command:**
+
+Use the command configured in the `Procfile` to start the Streamlit application.
+
+4. Under Environment Variables, add:
+
+```text
+GEMINI_API_KEY = your_gemini_key
+```
+
+5. Deploy the application. Render will build the vector database and start the Streamlit application.
+6. Once deployment is complete, Render provides a public URL to access the chatbot.
