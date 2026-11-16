@@ -1,1 +1,36 @@
 
+[
+  {
+    "id": 1,
+    "category": "direct",
+    "question": "What is the hostel fee?",
+    "expected_keywords": ["20,000", "semester"],
+    "expected_answer": "The hostel fee is Rs. 20,000 per semester.",
+    "should_have_evidence": true
+  },
+  {
+    "id": 2,
+    "category": "paraphrased",
+    "question": "How much does hostel accommodation cost per semester?",
+    "expected_keywords": ["20,000", "semester"],
+    "expected_answer": "The hostel fee is Rs. 20,000 per semester.",
+    "should_have_evidence": true
+  },
+  {
+    "id": 3,
+    "category": "out_of_scope",
+    "question": "Who won the FIFA World Cup in 2022?",
+    "expected_keywords": [],
+    "expected_answer": "I don't know.",
+    "should_have_evidence": false
+  },
+  {
+    "id": 4,
+    "category": "out_of_scope",
+    "question": "What is the capital of Japan?",
+    "expected_keywords": [],
+    "expected_answer": "I don't know.",
+    "should_have_evidence": false
+  }
+]
+
