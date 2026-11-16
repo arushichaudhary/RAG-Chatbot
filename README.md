@@ -90,6 +90,51 @@ python rag_chatbot.py
 streamlit run app.py
 ```
 
+## Answer Quality Evaluation
+
+In addition to retrieval evaluation, generated answers are manually compared against reference answers from the university knowledge base.
+
+The following aspects are checked:
+
+| Evaluation Criteria | Description |
+|---|---|
+| Factual correctness | Whether the answer matches the source document |
+| Context relevance | Whether the answer addresses the question |
+| Completeness | Whether important information is included |
+| Groundedness | Whether the answer is supported by retrieved context |
+| Unsupported questions | Whether the chatbot avoids inventing information |
+
+Answers are marked as Correct, Partially Correct, or Incorrect after comparison with the reference information.
+
+Out-of-scope questions are checked separately to evaluate whether the chatbot follows its missing-evidence instructions.
+
+## Chunking Strategy
+
+The project uses LangChain's RecursiveCharacterTextSplitter to divide the university document into smaller chunks.
+
+Current configuration:
+
+- Chunk size: 500 characters
+- Chunk overlap: 50 characters
+
+A 500-character chunk keeps the retrieved information relatively focused, while a 50-character overlap helps preserve context between consecutive chunks.
+
+These values were selected as initial configuration choices and can be adjusted based on retrieval evaluation.
+
+## Retrieval and Ranking Strategy
+
+The project uses FAISS for similarity-based retrieval.
+
+1. The user query is converted into an embedding using the same Sentence Transformers model used during ingestion.
+2. FAISS compares the query embedding with stored document embeddings.
+3. The three most similar chunks are retrieved.
+4. Retrieved chunks are combined into a context.
+5. The context and user question are passed to Gemini 2.5 Flash.
+
+The current implementation uses Top-3 similarity retrieval to balance relevant context and prompt size.
+
+FAISS distance scores are also inspected during evaluation to understand retrieval behaviour.
+
 ## Sample Inputs and Expected Outputs
 
 The following examples are based on the information available in `data/university.txt`. Outputs are illustrative and have not yet been verified through a live execution.
